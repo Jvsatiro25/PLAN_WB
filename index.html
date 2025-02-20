@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Planilha Central</title>
+    <style>
+        /* Estilos mantidos */
+        h1 {
+            text-align: center;
+            color: #333;
+        }
+        
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-family: Arial, sans-serif;
+        }
+
+        th, td {
+            border: 1px solid #ddd;
+            padding: 10px;
+            text-align: left;
+            
+        }
+
+        th {
+            background-color: #1E3A8A;
+            color: white;
+            
+        }
+
+        tr:nth-child(even) {
+            background-color: #f2f2f2;
+        }
+
+        tr:hover {
+            background-color: #ddd;
+        }
+
+        tbody tr td {
+            word-break: break-word;
+        }
+
+       
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f9;
+        }
+
+        .btn-excluir {
+            color: red;
+            cursor: pointer;
+        }
+
+        .btn-excluir:hover {
+            text-decoration: underline;
+        }
+
+        .btn-imprimir {
+            color: blue;
+            cursor: pointer;
+        }
+
+        .btn-imprimir:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+
+    <h1>Planilha Central</h1>
+    <table id="tabela-diagnosticos">
+        <thead>
+            <tr>
+                <th>Assessor</th> <!-- Adicionado campo Assessor -->
+                <th>Data</th>
+                <th>Nome</th>
+                <th>Contato</th>
+                <th>Ofício</th>
+                <th>Endereço</th> <!-- Alterado de Bairro para Endereço -->
+                <th>Assunto</th>
+                <th>Ação</th>
+            </tr>
+        </thead>
+        <tbody>
+            <!-- Os dados serão inseridos aqui -->
+        </tbody>
+    </table>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/9.21.0/firebase-app.js";
+        import { getFirestore, collection, getDocs, deleteDoc, doc } from "https://www.gstatic.com/firebasejs/9.21.0/firebase-firestore.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyDiC4oMxGofdMXSqQbf6mHua0dLafYrdlU",
+            authDomain: "formulario-27b90.firebaseapp.com",
+            projectId: "formulario-27b90",
+            storageBucket: "formulario-27b90.firebasestorage.app",
+            messagingSenderId: "540452486205",
+            appId: "1:540452486205:web:e6c49369e7578a54863e54",
+            measurementId: "G-0TRRZ97998"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+
+        // Função para formatar a data para "DD/MM/YYYY"
+        function formatarData(data) {
+            const partes = data.split('-'); // Supondo que a data esteja no formato "YYYY-MM-DD"
+            return `${partes[2]}/${partes[1]}/${partes[0]}`;
+        }
+
+        async function carregarDiagnosticos() {
+            const querySnapshot = await getDocs(collection(db, "FORM_WB"));
+            const tabela = document.getElementById("tabela-diagnosticos").getElementsByTagName('tbody')[0];
+            tabela.innerHTML = "";
+
+            querySnapshot.forEach((docSnapshot) => {
+                const dados = docSnapshot.data();
+                const novaLinha = tabela.insertRow();
+
+                // Adicionando Assessor
+                novaLinha.insertCell(0).textContent = dados.assessor || 'Não especificado';
+
+                // Formatar a data para "DD/MM/YYYY"
+                novaLinha.insertCell(1).textContent = formatarData(dados.data);
+                novaLinha.insertCell(2).textContent = dados.nome;
+                novaLinha.insertCell(3).textContent = dados.contato;
+                novaLinha.insertCell(4).textContent = dados.oficio;
+                novaLinha.insertCell(5).textContent = dados.endereco;  // Substituindo Bairro por Endereço
+                novaLinha.insertCell(6).textContent = dados.assunto;
+
+                // Adicionando os botões
+                const celulaAcao = novaLinha.insertCell(7);
+
+                // Botão de imprimir
+                const botaoImprimir = document.createElement("button");
+                botaoImprimir.textContent = "Imprimir";
+                botaoImprimir.classList.add("btn-imprimir");
+                botaoImprimir.addEventListener("click", () => {
+                    localStorage.setItem('diagnosticoSelecionado', JSON.stringify(dados));
+                    window.location.href = "impressao.html";
+                });
+                celulaAcao.appendChild(botaoImprimir);
+
+                // Botão de exclusão
+                const botaoExcluir = document.createElement("button");
+                botaoExcluir.textContent = "Excluir";
+                botaoExcluir.classList.add("btn-excluir");
+                botaoExcluir.addEventListener("click", async () => {
+                    if (confirm(`Deseja realmente excluir o registro de ${dados.nome}?`)) {
+                        try {
+                            await deleteDoc(doc(db, "FORM_WB", docSnapshot.id));
+                            alert("Registro excluído com sucesso!");
+                            carregarDiagnosticos();
+                        } catch (error) {
+                            console.error("Erro ao excluir o registro:", error);
+                            alert("Não foi possível excluir o registro.");
+                        }
+                    }
+                });
+                celulaAcao.appendChild(botaoExcluir);
+            });
+        }
+
+        carregarDiagnosticos();
+    </script>
+
+</body>
+</html>

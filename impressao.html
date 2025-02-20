@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Impressão</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 40px;
+            padding: 0;
+            line-height: 1.6;
+        }
+        h1, h3 {
+            text-align: center;
+            color: #000000;
+        }
+        #conteudoImpressao {
+            margin: 0 20px;
+        }
+        p {
+            margin-bottom: 15px;
+        }
+        .logo {
+            text-align: center;
+            margin-bottom: 80px;
+            margin-top: 50px;
+            
+        }
+        .assinatura {
+            width: 200px;
+            display: block;
+            margin: 0 auto;
+            margin-top: 200px;
+        }
+    </style>
+</head>
+<body>
+    <div class="logo">
+        <img src="LOGO.png" alt="Logo" width="300">
+    </div>
+
+    <div id="conteudoImpressao">
+    </div>
+
+    <div class="assinado">
+        <img src="assinatura.png" alt="Assinatura" class="assinatura">
+        
+    </div>
+
+    <script>
+        // Função para formatar a data por extenso e em caixa alta
+        function formatarDataPorExtenso(data) {
+            const meses = [
+                'JANEIRO', 'FEVEREIRO', 'MARÇO', 'ABRIL', 'MAIO', 'JUNHO',
+                'JULHO', 'AGOSTO', 'SETEMBRO', 'OUTUBRO', 'NOVEMBRO', 'DEZEMBRO'
+            ];
+            const dia = data.getDate();
+            const mes = meses[data.getMonth()];
+            const ano = data.getFullYear();
+            return `${dia} DE ${mes} DE ${ano}`;
+        }
+
+        // Função para adicionar um dia à data
+        function adicionarUmDia(data) {
+            const novaData = new Date(data);
+            novaData.setDate(novaData.getDate() + 1);  // Adiciona um dia
+            return novaData;
+        }
+
+        // Recuperar o diagnóstico selecionado do localStorage
+        const diagnostico = JSON.parse(localStorage.getItem('diagnosticoSelecionado'));
+
+        if (diagnostico) {
+            // Obter a data atual e formatá-la por extenso
+            const dataAtual = formatarDataPorExtenso(new Date());
+
+            // Formatando a data da solicitação por extenso, com um dia a mais
+            const dataSolicitacao = formatarDataPorExtenso(adicionarUmDia(new Date(diagnostico.data)));
+
+            const conteudo = `
+                <p>
+                    PETRÓPOLIS, <strong>${dataAtual}</strong>.
+                </p>
+                <p>
+                    INDICA AO EXECUTIVO MUNICIPAL A NECESSIDADE DE SOLUÇÃO PARA O ASSUNTO DE 
+                    <strong>${diagnostico.assunto.toUpperCase()}</strong>, 
+                    LOCALIZADO NO ENDEREÇO <strong>${diagnostico.endereco.toUpperCase()}, PETRÓPOLIS/RJ.</strong>
+                </p>
+                <p>
+                    O VEREADOR <strong>WESLEY BARRETO GOMES DA COSTA</strong>, JUNTO COM O(A) 
+                    <strong>${diagnostico.oficio.toUpperCase()}</strong> 
+                    <strong>${diagnostico.nome.toUpperCase()}</strong>, QUE ENVIOU UMA SOLICITAÇÃO NO DIA 
+                    <strong>${dataSolicitacao}</strong>, INFRA-ASSINADO, 
+                    SATISFEITAS AS FORMALIDADES REGIMENTAIS E OUVIDO O PLENÁRIO, INDICA AO EXMO. SR. PREFEITO 
+                    MUNICIPAL A NECESSIDADE DE SOLUCIONAR O ASSUNTO DE <strong>${diagnostico.assunto.toUpperCase()}</strong>.
+                </p>
+                <h3>JUSTIFICATIVA</h3>
+                <p>
+                    JUSTIFICA-SE O PRESENTE PEDIDO EM RAZÃO DE <strong>${diagnostico.assunto.toUpperCase()}</strong>, 
+                    IMPACTANDO DIRETAMENTE A PRESTAÇÃO DE SERVIÇOS E A QUALIDADE DE VIDA DOS MORADORES DA REGIÃO. 
+                    DESSA FORMA, SOLICITA-SE A AVALIAÇÃO DA SITUAÇÃO E A TOMADA DE MEDIDAS CABÍVEIS PARA RESOLVER A QUESTÃO, 
+                    GARANTINDO O ATENDIMENTO ADEQUADO ÀS DEMANDAS DA COMUNIDADE.
+                </p>
+            `;
+
+
+
+            document.getElementById('conteudoImpressao').innerHTML = conteudo;
+
+             // Abrir a janela de impressão automaticamente
+             window.onload = function() {
+                window.print();
+            };
+        } else {
+            document.getElementById('conteudoImpressao').innerHTML = '<p>Erro: Nenhum dado foi encontrado para impressão.</p>';
+        }
+    </script>
+</body>
+</html>

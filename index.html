@@ -5,13 +5,12 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Planilha Central</title>
     <style>
-        /* Estilos mantidos */
         h1 {
             text-align: center;
             color: #333;
+            
         }
-        
-        
+
         table {
             width: 100%;
             border-collapse: collapse;
@@ -19,81 +18,109 @@
         }
 
         th, td {
-            border: 1px solid #ddd;
+            border: 1px solid #000000;
             padding: 10px;
             text-align: left;
-            
         }
 
         th {
             background-color: #1E3A8A;
             color: white;
-            
         }
 
         tr:nth-child(even) {
-            background-color: #f2f2f2;
+            background-color: hsl(240, 50%, 94%);
         }
 
         tr:hover {
             background-color: #ddd;
         }
 
-        tbody tr td {
-            word-break: break-word;
+        .situacao {
+            width: 100%;
+            height: 50px;
+            display: inline-block;
+            border-radius: 4px;
         }
 
-       
-        body {
-            font-family: Arial, sans-serif;
-            margin: 0;
-            padding: 0;
-            background-color: #f4f4f9;
+        .situacao.concluido {
+            background-color: #27ae60;
+        }
+
+        .situacao.andamento {
+            background-color: #f39c12;
         }
 
         .btn-excluir {
-            color: red;
+            background-color: rgb(202, 63, 63);
+            color: white;
             cursor: pointer;
-        }
-
-        .btn-excluir:hover {
-            text-decoration: underline;
+            margin-left: 0px;
+            margin-top: 5px;
+            padding: 5px;
         }
 
         .btn-imprimir {
-            color: blue;
+            background-color: #1E3A8A;
+            color: white;
             cursor: pointer;
+            padding: 5px;
+            margin-right: 5px;
         }
 
-        .btn-imprimir:hover {
-            text-decoration: underline;
+
+        #campo-pesquisa {
+            width: 20%;
+            padding: 12px 40px 12px 15px;
+            font-size: 16px;
+            border-radius: 25px;
+            border: 1px solid #ccc;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+            margin-bottom: 20px;
+            margin-top: 20px;
         }
+
+        #campo-pesquisa:focus {
+            border-color: #4b4d53;
+            outline: none;
+            box-shadow: 0 2px 8px rgba(30, 58, 138, 0.5);
+        }
+
+        #campo-pesquisa::placeholder {
+            color: #aaa;
+        }
+
+        
     </style>
 </head>
 <body>
-
-    <h1>Planilha Central</h1>
+    
+    <div class="search-container">
+        <input type="text" id="campo-pesquisa" placeholder="Pesquisar...">
+        
+    </div>
     <table id="tabela-diagnosticos">
         <thead>
             <tr>
-                <th>Assessor</th> <!-- Adicionado campo Assessor -->
+                <th>Assessor</th>
                 <th>Data</th>
                 <th>Nome</th>
                 <th>Contato</th>
                 <th>Ofício</th>
-                <th>Endereço</th> <!-- Alterado de Bairro para Endereço -->
+                <th>Endereço</th>
                 <th>Assunto</th>
-                <th>Ação</th>
+                <th>Arquivo</th>
+                <th>Situação</th>
+                <th></th>
             </tr>
         </thead>
-        <tbody>
-            <!-- Os dados serão inseridos aqui -->
-        </tbody>
+        <tbody></tbody>
     </table>
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/9.21.0/firebase-app.js";
-        import { getFirestore, collection, getDocs, deleteDoc, doc } from "https://www.gstatic.com/firebasejs/9.21.0/firebase-firestore.js";
+        import { getFirestore, collection, getDocs, query, orderBy, deleteDoc, doc, updateDoc } from "https://www.gstatic.com/firebasejs/9.21.0/firebase-firestore.js";
 
         const firebaseConfig = {
             apiKey: "AIzaSyDiC4oMxGofdMXSqQbf6mHua0dLafYrdlU",
@@ -108,36 +135,52 @@
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
 
-        // Função para formatar a data para "DD/MM/YYYY"
         function formatarData(data) {
-            const partes = data.split('-'); // Supondo que a data esteja no formato "YYYY-MM-DD"
+            const partes = data.split('-');
             return `${partes[2]}/${partes[1]}/${partes[0]}`;
         }
 
         async function carregarDiagnosticos() {
-            const querySnapshot = await getDocs(collection(db, "FORM_WB"));
+            const q = query(collection(db, "FORM_WB"), orderBy("timestamp", "desc"));
+            const querySnapshot = await getDocs(q);
             const tabela = document.getElementById("tabela-diagnosticos").getElementsByTagName('tbody')[0];
             tabela.innerHTML = "";
 
-            querySnapshot.forEach((docSnapshot) => {
+            querySnapshot.forEach(async (docSnapshot) => {
                 const dados = docSnapshot.data();
                 const novaLinha = tabela.insertRow();
-
-                // Adicionando Assessor
                 novaLinha.insertCell(0).textContent = dados.assessor || 'Não especificado';
-
-                // Formatar a data para "DD/MM/YYYY"
                 novaLinha.insertCell(1).textContent = formatarData(dados.data);
                 novaLinha.insertCell(2).textContent = dados.nome;
                 novaLinha.insertCell(3).textContent = dados.contato;
                 novaLinha.insertCell(4).textContent = dados.oficio;
-                novaLinha.insertCell(5).textContent = dados.endereco;  // Substituindo Bairro por Endereço
+                novaLinha.insertCell(5).textContent = dados.endereco;
                 novaLinha.insertCell(6).textContent = dados.assunto;
-
-                // Adicionando os botões
-                const celulaAcao = novaLinha.insertCell(7);
-
-                // Botão de imprimir
+                
+                const celulaArquivo = novaLinha.insertCell(7);
+                if (dados.arquivoURL) {
+                    const botaoVer = document.createElement("button");
+                    botaoVer.textContent = "Ver Arquivo";
+                    botaoVer.addEventListener("click", () => {
+                        window.open(dados.arquivoURL, '_blank');
+                    });
+                    celulaArquivo.appendChild(botaoVer);
+                } else {
+                    celulaArquivo.textContent = "Sem arquivo";
+                }
+                
+                const celulaSituacao = novaLinha.insertCell(8);
+                const quadradoSituacao = document.createElement("div");
+                quadradoSituacao.classList.add("situacao", dados.situacao === "Concluído" ? "concluido" : "andamento");
+                celulaSituacao.appendChild(quadradoSituacao);
+                quadradoSituacao.addEventListener("click", async () => {
+                    const novaSituacao = dados.situacao === "Concluído" ? "Em andamento" : "Concluído";
+                    await updateDoc(doc(db, "FORM_WB", docSnapshot.id), { situacao: novaSituacao });
+                    quadradoSituacao.classList.toggle("concluido");
+                    quadradoSituacao.classList.toggle("andamento");
+                });
+                
+                const celulaAcao = novaLinha.insertCell(9);
                 const botaoImprimir = document.createElement("button");
                 botaoImprimir.textContent = "Imprimir";
                 botaoImprimir.classList.add("btn-imprimir");
@@ -147,28 +190,28 @@
                 });
                 celulaAcao.appendChild(botaoImprimir);
 
-                // Botão de exclusão
                 const botaoExcluir = document.createElement("button");
                 botaoExcluir.textContent = "Excluir";
                 botaoExcluir.classList.add("btn-excluir");
                 botaoExcluir.addEventListener("click", async () => {
                     if (confirm(`Deseja realmente excluir o registro de ${dados.nome}?`)) {
-                        try {
-                            await deleteDoc(doc(db, "FORM_WB", docSnapshot.id));
-                            alert("Registro excluído com sucesso!");
-                            carregarDiagnosticos();
-                        } catch (error) {
-                            console.error("Erro ao excluir o registro:", error);
-                            alert("Não foi possível excluir o registro.");
-                        }
+                        await deleteDoc(doc(db, "FORM_WB", docSnapshot.id));
+                        alert("Registro excluído com sucesso!");
+                        carregarDiagnosticos();
                     }
                 });
                 celulaAcao.appendChild(botaoExcluir);
             });
         }
 
+        document.getElementById("campo-pesquisa").addEventListener("input", function() {
+            const termo = this.value.toLowerCase();
+            document.querySelectorAll("#tabela-diagnosticos tbody tr").forEach(tr => {
+                tr.style.display = tr.innerText.toLowerCase().includes(termo) ? "" : "none";
+            });
+        });
+
         carregarDiagnosticos();
     </script>
-
 </body>
 </html>

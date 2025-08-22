@@ -23,17 +23,30 @@
             margin-bottom: 15px;
         }
         .logo {
-            text-align: center;
             margin-bottom: 80px;
             margin-top: 50px;
+            margin-left: 20px;
             
         }
         .assinatura {
             width: 200px;
             display: block;
             margin: 0 auto;
-            margin-top: 200px;
+            margin-top: 100px
         }
+
+        @media print {
+            @page {
+                margin: 20mm;
+                size: A4;
+            }
+
+            /* Remove cabeçalho e rodapé do navegador */
+            body {
+                -webkit-print-color-adjust: exact;
+                print-color-adjust: exact;
+            }
+            }
     </style>
 </head>
 <body>
@@ -50,72 +63,159 @@
     </div>
 
     <script>
-        // Função para formatar a data por extenso e em caixa alta
-        function formatarDataPorExtenso(data) {
-            const meses = [
-                'JANEIRO', 'FEVEREIRO', 'MARÇO', 'ABRIL', 'MAIO', 'JUNHO',
-                'JULHO', 'AGOSTO', 'SETEMBRO', 'OUTUBRO', 'NOVEMBRO', 'DEZEMBRO'
-            ];
-            const dia = data.getDate();
-            const mes = meses[data.getMonth()];
-            const ano = data.getFullYear();
-            return `${dia} DE ${mes} DE ${ano}`;
+    // ===============================
+    // Função para formatar datas
+    // ===============================
+    function formatarDataPorExtenso(data) {
+        const meses = [
+            'JANEIRO', 'FEVEREIRO', 'MARÇO', 'ABRIL', 'MAIO', 'JUNHO',
+            'JULHO', 'AGOSTO', 'SETEMBRO', 'OUTUBRO', 'NOVEMBRO', 'DEZEMBRO'
+        ];
+        const dia = data.getDate();
+        const mes = meses[data.getMonth()];
+        const ano = data.getFullYear();
+        return `${dia} DE ${mes} DE ${ano}`;
+    }
+
+    function adicionarUmDia(data) {
+        const novaData = new Date(data);
+        novaData.setDate(novaData.getDate() + 1);
+        return novaData;
+    }
+
+    // ===============================
+    // Função para classificar assunto
+    // ===============================
+    function classificarAssunto(texto) {
+        if (!texto) return "Outros";
+        const assunto = texto.toLowerCase();
+        let tiposProblemas = {};
+
+        // 1. Iluminação pública
+        if (assunto.includes('iluminação') || assunto.includes('iluminacao') ||
+            assunto.includes('luz') || assunto.includes('led') || assunto.includes('poste')) {
+            tiposProblemas['Iluminação Pública'] = (tiposProblemas['Iluminação Pública'] || 0) + 1;
         }
 
-        // Função para adicionar um dia à data
-        function adicionarUmDia(data) {
-            const novaData = new Date(data);
-            novaData.setDate(novaData.getDate() + 1);  // Adiciona um dia
-            return novaData;
+        // 2. Buracos e pavimentação
+        if (assunto.includes('buraco') || assunto.includes('asfalto') ||
+            assunto.includes('pavimentação') || assunto.includes('pavimentacao') ||
+            assunto.includes('tapa buraco') || assunto.includes('rua afundando')) {
+            tiposProblemas['Buracos na Via'] = (tiposProblemas['Buracos na Via'] || 0) + 1;
         }
 
-        // Recuperar o diagnóstico selecionado do localStorage
-        const diagnostico = JSON.parse(localStorage.getItem('diagnosticoSelecionado'));
+        // 3. Limpeza urbana
+        if (assunto.includes('limpeza') || assunto.includes('lixo') ||
+            assunto.includes('sujeira') || assunto.includes('lixeira') ||
+            assunto.includes('caçamba') || assunto.includes('cacamba') ||
+            assunto.includes('capina') || assunto.includes('roçada') ||
+            assunto.includes('rocada')) {
+            tiposProblemas['Limpeza Urbana'] = (tiposProblemas['Limpeza Urbana'] || 0) + 1;
+        }
 
-        if (diagnostico) {
-            // Obter a data atual e formatá-la por extenso
-            const dataAtual = formatarDataPorExtenso(new Date());
+        // 4. Sinalização e trânsito
+        if (assunto.includes('sinalização') || assunto.includes('sinalizacao') ||
+            assunto.includes('placa') || assunto.includes('semáforo') ||
+            assunto.includes('semaforo') || assunto.includes('faixa de pedestre') ||
+            assunto.includes('quebra-mola') || assunto.includes('quebramola') ||
+            assunto.includes('redutor')) {
+            tiposProblemas['Sinalização e Trânsito'] = (tiposProblemas['Sinalização e Trânsito'] || 0) + 1;
+        }
 
-            // Formatando a data da solicitação por extenso, com um dia a mais
-            const dataSolicitacao = formatarDataPorExtenso(adicionarUmDia(new Date(diagnostico.data)));
+        // 5. Áreas verdes / lazer
+        if (assunto.includes('área verde') || assunto.includes('area verde') ||
+            assunto.includes('praça') || assunto.includes('praca') ||
+            assunto.includes('pracinha') || assunto.includes('parque') ||
+            assunto.includes('quadra') || assunto.includes('campo')) {
+            tiposProblemas['Áreas Verdes'] = (tiposProblemas['Áreas Verdes'] || 0) + 1;
+        }
 
-            const conteudo = `
+        // 6. Água, esgoto e drenagem
+        if (assunto.includes('água') || assunto.includes('agua') ||
+            assunto.includes('esgoto') || assunto.includes('bueiro') ||
+            assunto.includes('manilha') || assunto.includes('drenagem')) {
+            tiposProblemas['Água e Esgoto'] = (tiposProblemas['Água e Esgoto'] || 0) + 1;
+        }
+
+        // 7. Transporte público
+        if (assunto.includes('ônibus') || assunto.includes('onibus') ||
+            assunto.includes('transporte') || assunto.includes('escolar')) {
+            tiposProblemas['Transporte Público'] = (tiposProblemas['Transporte Público'] || 0) + 1;
+        }
+
+        // 8. Poda de árvores
+        if (assunto.includes('poda') || assunto.includes('árvore') || assunto.includes('arvore') ||
+            assunto.includes('galho') || assunto.includes('tronco')) {
+            tiposProblemas['Poda de Árvores'] = (tiposProblemas['Poda de Árvores'] || 0) + 1;
+        }
+
+        // 9. Infraestrutura Urbana
+        if (assunto.includes('ponte') || assunto.includes('viaduto') ||
+            assunto.includes('passarela') || assunto.includes('calçada') ||
+            assunto.includes('calcada') || assunto.includes('acessibilidade') ||
+            assunto.includes('servidão') || assunto.includes('servidao') ||
+            assunto.includes('galeria') || assunto.includes('muro') ||
+            assunto.includes('contenção') || assunto.includes('contencao')) {
+            tiposProblemas['Infraestrutura Urbana'] = (tiposProblemas['Infraestrutura Urbana'] || 0) + 1;
+        }
+
+        // Escolhe categoria mais relevante
+        const categorias = Object.keys(tiposProblemas);
+        if (categorias.length === 0) return "Outros";
+        return categorias.reduce((a, b) => tiposProblemas[a] >= tiposProblemas[b] ? a : b);
+    }
+
+    // ===============================
+    // Montagem da impressão
+    // ===============================
+    const diagnostico = JSON.parse(localStorage.getItem('diagnosticoSelecionado'));
+
+    if (diagnostico) {
+        const dataAtual = formatarDataPorExtenso(new Date());
+        const dataSolicitacao = formatarDataPorExtenso(adicionarUmDia(new Date(diagnostico.data)));
+
+        const categoria = classificarAssunto(diagnostico.assunto);
+
+        const conteudo = `
+            <div contenteditable="true">
                 <p>
                     PETRÓPOLIS, <strong>${dataAtual}</strong>.
                 </p>
                 <p>
-                    INDICA AO EXECUTIVO MUNICIPAL A NECESSIDADE DE SOLUÇÃO PARA O ASSUNTO DE 
-                    <strong>${diagnostico.assunto.toUpperCase()}</strong>, 
-                    LOCALIZADO NO ENDEREÇO <strong>${diagnostico.endereco.toUpperCase()}, PETRÓPOLIS/RJ.</strong>
+                    INDICA AO EXECUTIVO MUNICIPAL A NECESSIDADE DE SOLUÇÃO PARA O ASSUNTO CLASSIFICADO COMO 
+                    <strong>${categoria.toUpperCase()}</strong>, 
+                    LOCALIZADO NO ENDEREÇO <strong>${diagnostico.rua?.toUpperCase() || ''}, ${diagnostico.bairro?.toUpperCase() || ''}, ${diagnostico.numero?.toUpperCase() || ''}, PETRÓPOLIS/RJ.</strong>
                 </p>
                 <p>
                     O VEREADOR <strong>WESLEY BARRETO GOMES DA COSTA</strong>, JUNTO COM O(A) 
-                    <strong>${diagnostico.oficio.toUpperCase()}</strong> 
-                    <strong>${diagnostico.nome.toUpperCase()}</strong>, QUE ENVIOU UMA SOLICITAÇÃO NO DIA 
+                    <strong>${diagnostico.oficio?.toUpperCase() || ''}</strong> 
+                    <strong>${diagnostico.nome?.toUpperCase() || ''}</strong>, QUE ENVIOU UMA SOLICITAÇÃO NO DIA 
                     <strong>${dataSolicitacao}</strong>, INFRA-ASSINADO, 
                     SATISFEITAS AS FORMALIDADES REGIMENTAIS E OUVIDO O PLENÁRIO, INDICA AO EXMO. SR. PREFEITO 
-                    MUNICIPAL A NECESSIDADE DE SOLUCIONAR O ASSUNTO DE <strong>${diagnostico.assunto.toUpperCase()}</strong>.
+                    MUNICIPAL A NECESSIDADE DE SOLUCIONAR O REFERIDO ASSUNTO.
                 </p>
                 <h3>JUSTIFICATIVA</h3>
                 <p>
-                    JUSTIFICA-SE O PRESENTE PEDIDO EM RAZÃO DE <strong>${diagnostico.assunto.toUpperCase()}</strong>, 
-                    IMPACTANDO DIRETAMENTE A PRESTAÇÃO DE SERVIÇOS E A QUALIDADE DE VIDA DOS MORADORES DA REGIÃO. 
+                    JUSTIFICA-SE O PRESENTE PEDIDO EM RAZÃO DE PROBLEMAS RELACIONADOS À CATEGORIA 
+                    <strong>${categoria.toUpperCase()}</strong>, IMPACTANDO DIRETAMENTE A PRESTAÇÃO DE 
+                    SERVIÇOS E A QUALIDADE DE VIDA DOS MORADORES DA REGIÃO. 
                     DESSA FORMA, SOLICITA-SE A AVALIAÇÃO DA SITUAÇÃO E A TOMADA DE MEDIDAS CABÍVEIS PARA RESOLVER A QUESTÃO, 
                     GARANTINDO O ATENDIMENTO ADEQUADO ÀS DEMANDAS DA COMUNIDADE.
                 </p>
-            `;
+            </div>
+        `;
+
+        document.getElementById('conteudoImpressao').innerHTML = conteudo;
+
+        window.onload = function() {
+            window.print();
+        };
+    } else {
+        document.getElementById('conteudoImpressao').innerHTML = '<p>Erro: Nenhum dado foi encontrado para impressão.</p>';
+    }
+</script>
 
 
 
-            document.getElementById('conteudoImpressao').innerHTML = conteudo;
-
-             // Abrir a janela de impressão automaticamente
-             window.onload = function() {
-                window.print();
-            };
-        } else {
-            document.getElementById('conteudoImpressao').innerHTML = '<p>Erro: Nenhum dado foi encontrado para impressão.</p>';
-        }
-    </script>
 </body>
 </html>

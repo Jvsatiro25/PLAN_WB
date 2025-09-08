@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Planilha Central</title>
+    <title>Planilha </title>
     <style>
         * {
             margin: 0;
@@ -432,7 +432,7 @@
                 <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M3 6h18m-9 8h9m-9 4h9m-9-8h9m-9 4h9"></path>
                 </svg>
-                Planilha Central
+                Planilha 
             </div>
             <div class="nav-item" onclick="window.location.href='dashboard.html'">
                 <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -450,12 +450,12 @@
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M3 6h18m-9 8h9m-9 4h9m-9-8h9m-9 4h9"></path>
                 </svg>
             </div>
-            <h1>Planilha Central</h1>
-            <p class="header-description">Visualize e gerencie todos os registros</p>
+            <h1>Planilha</h1>
+            <p class="header-description">Visualize e gerencie todas as demandas</p>
         </div>
         
         <div class="search-container">
-            <input type="text" id="campo-pesquisa" placeholder="Pesquisar registros...">
+            <input type="text" id="campo-pesquisa" placeholder="Pesquisar demandas...">
         </div>
 
         <div class="table-container">
@@ -466,7 +466,7 @@
                             <svg class="header-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path>
                             </svg>
-                            ssessor
+                            Assessor
                         </th>
                         <th>
                             <svg class="header-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -641,7 +641,7 @@ async function carregarDiagnosticos() {
         botaoExcluir.addEventListener("click", async () => {
             if (confirm(`Deseja realmente excluir o registro de ${dados.nome}?`)) {
                 await deleteDoc(doc(db, "FORM_WB "/*espaço*/, docSnapshot.id));
-                alert("Registro excluído com sucesso!");
+                alert("Demanda excluído com sucesso!");
                 carregarDiagnosticos();
             }
         });

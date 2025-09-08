@@ -443,7 +443,7 @@
                 <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M3 6h18m-9 8h9m-9 4h9m-9-8h9m-9 4h9"></path>
                 </svg>
-                Planilha Central
+                Planilha 
             </div>
             <div class="nav-item active">
                 <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -462,7 +462,7 @@
                 </svg>
             </div>
             <h1 class="header-title">Dashboard</h1>
-            <p class="header-subtitle">Painel de controle - Diagnósticos e Problemas Urbanos</p>
+            <p class="header-subtitle">Painel de controle - Diagnósticos e Demandas Urbanas</p>
         </div>
 
         <div class="stats-grid">
@@ -473,7 +473,7 @@
                     </svg>
                 </div>
                 <div class="stat-number">0</div>
-                <div class="stat-label">Problemas Abertos</div>
+                <div class="stat-label">Demandas Abertas</div>
             </div>
 
             <div class="card stat-card">
@@ -483,7 +483,8 @@
                     </svg>
                 </div>
                 <div class="stat-number">0</div>
-                <div class="stat-label">Problemas Resolvidos</div>
+                <div class="stat-label">Demandas Resolvidas
+                </div>
             </div>
         </div>
 
@@ -496,7 +497,7 @@
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path>
                         </svg>
                     </div>
-                    <h3 class="card-title">Problemas por Bairro</h3>
+                    <h3 class="card-title">Demandas por Bairro</h3>
                 </div>
 
                 <div class="card-content">
@@ -512,7 +513,7 @@
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
                         </svg>
                     </div>
-                    <h3 class="card-title">Tipos de Problemas Mais Comuns</h3>
+                    <h3 class="card-title">Tipos de Demandas Mais Comuns</h3>
                 </div>
                 <div class="card-content">
                 </div>
@@ -525,7 +526,7 @@
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197m13.5-9a2.5 2.5 0 11-5 0 2.5 2.5 0 015 0z"></path>
                         </svg>
                     </div>
-                    <h3 class="card-title">Registros por Assessor</h3>
+                    <h3 class="card-title">Demandas por Assessor</h3>
                 </div>
                 <div class="card-content">
                 </div>
@@ -561,7 +562,7 @@ async function atualizarDashboard() {
         let problemasAbertos = 0;
         let problemasResolvidos = 0;
         let bairros = {};
-        let tiposProblemas = {};
+        let tiposDemandas = {};
         let assessores = {};
 
         querySnapshot.forEach((doc) => {
@@ -594,7 +595,7 @@ if (dados.assunto) {
         assunto.includes('led') ||
         assunto.includes('poste')
     ) {
-        tiposProblemas['Iluminação Pública'] = (tiposProblemas['Iluminação Pública'] || 0) + 1;
+        tiposDemandas['Iluminação Pública'] = (tiposDemandas['Iluminação Pública'] || 0) + 1;
     }
 
     // ============================
@@ -609,7 +610,7 @@ if (dados.assunto) {
         assunto.includes('tapa buraco') ||
         assunto.includes('rua afundando')
     ) {
-        tiposProblemas['Buracos na Via'] = (tiposProblemas['Buracos na Via'] || 0) + 1;
+        tiposDemandas['Buracos na Via'] = (tiposDemandas['Buracos na Via'] || 0) + 1;
     }
 
     // ============================
@@ -627,7 +628,7 @@ if (dados.assunto) {
         assunto.includes('roçada') ||
         assunto.includes('rocada')
     ) {
-        tiposProblemas['Limpeza Urbana'] = (tiposProblemas['Limpeza Urbana'] || 0) + 1;
+        tiposDemandas['Limpeza Urbana'] = (tiposDemandas['Limpeza Urbana'] || 0) + 1;
     }
 
     // ============================
@@ -645,7 +646,7 @@ if (dados.assunto) {
         assunto.includes('quebramola') ||
         assunto.includes('redutor')
     ) {
-        tiposProblemas['Sinalização e Trânsito'] = (tiposProblemas['Sinalização e Trânsito'] || 0) + 1;
+        tiposDemandas['Sinalização e Trânsito'] = (tiposDemandas['Sinalização e Trânsito'] || 0) + 1;
     }
 
     // ============================
@@ -662,7 +663,7 @@ if (dados.assunto) {
         assunto.includes('quadra') ||
         assunto.includes('campo')
     ) {
-        tiposProblemas['Áreas Verdes'] = (tiposProblemas['Áreas Verdes'] || 0) + 1;
+        tiposDemandas['Áreas Verdes'] = (tiposDemandas['Áreas Verdes'] || 0) + 1;
     }
 
     // ============================
@@ -677,7 +678,7 @@ if (dados.assunto) {
         assunto.includes('manilha') ||
         assunto.includes('drenagem')
     ) {
-        tiposProblemas['Água e Esgoto'] = (tiposProblemas['Água e Esgoto'] || 0) + 1;
+        tiposDemandas['Água e Esgoto'] = (tiposDemandas['Água e Esgoto'] || 0) + 1;
     }
 
     // ============================
@@ -690,7 +691,7 @@ if (dados.assunto) {
         assunto.includes('transporte') ||
         assunto.includes('escolar')
     ) {
-        tiposProblemas['Transporte Público'] = (tiposProblemas['Transporte Público'] || 0) + 1;
+        tiposDemandas['Transporte Público'] = (tiposDemandas['Transporte Público'] || 0) + 1;
     }
 
     // ============================
@@ -704,7 +705,7 @@ if (dados.assunto) {
         assunto.includes('galho') ||
         assunto.includes('tronco')
     ) {
-        tiposProblemas['Poda de Árvores'] = (tiposProblemas['Poda de Árvores'] || 0) + 1;
+        tiposDemandas['Poda de Árvores'] = (tiposDemandas['Poda de Árvores'] || 0) + 1;
     }
 
     // ============================
@@ -726,7 +727,7 @@ if (dados.assunto) {
         assunto.includes('contenção') ||
         assunto.includes('contencao')
     ) {
-        tiposProblemas['Infraestrutura Urbana'] = (tiposProblemas['Infraestrutura Urbana'] || 0) + 1;
+        tiposDemandas['Infraestrutura Urbana'] = (tiposDemandas['Infraestrutura Urbana'] || 0) + 1;
     }
 }
 
@@ -739,9 +740,9 @@ if (dados.assunto) {
         document.querySelector('.stat-card:nth-child(1) .stat-number').textContent = problemasAbertos;
         document.querySelector('.stat-card:nth-child(2) .stat-number').textContent = problemasResolvidos;
 
-        atualizarGrafico('Problemas por Bairro', bairros);
-        atualizarGrafico('Tipos de Problemas Mais Comuns', tiposProblemas);
-        atualizarGrafico('Registros por Assessor', assessores);
+        atualizarGrafico('Demandas por Bairro', bairros);
+        atualizarGrafico('Tipos de Demandas Mais Comuns', tiposDemandas);
+        atualizarGrafico('Demandas por Assessor', assessores);
 
         console.log('[v2] Dashboard atualizado com dados reais');
 
@@ -786,7 +787,7 @@ function atualizarGrafico(titulo, dados) {
             <div class="progress-bar-bg">
                 <div class="progress-bar" style="width: ${porcentagem}%;"></div>
             </div>
-            <span class="progress-percent">${quantidade} ${titulo.includes('Registros') ? 'registros' : 'casos'}</span>
+            <span class="progress-percent">${quantidade} ${titulo.includes('Demandas') ? 'registros' : 'casos'}</span>
         `;
 
         cardContent.appendChild(progressItem);

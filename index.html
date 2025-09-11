@@ -601,16 +601,16 @@ async function carregarDiagnosticos() {
 
         // Arquivos
         const celulaArquivo = novaLinha.insertCell(9);
-        if (dados.arquivosURLs) {
+        if (dados.arquivosURLs && dados.arquivosURLs.length > 0) {
             const arquivos = Array.isArray(dados.arquivosURLs) ? dados.arquivosURLs : [dados.arquivosURLs];
             const botaoVer = document.createElement("button");
             botaoVer.textContent = "Ver Arquivos";
             botaoVer.className = "btn-base btn-ver-arquivos";
             botaoVer.addEventListener("click", () => abrirCarrossel(arquivos));
             celulaArquivo.appendChild(botaoVer);
-        } else {
-            celulaArquivo.textContent = "Sem arquivo";
         }
+        // caso contrário, deixa vazio mesmo
+
 
         // Situação
         const celulaSituacao = novaLinha.insertCell(10);
@@ -619,7 +619,11 @@ async function carregarDiagnosticos() {
         celulaSituacao.appendChild(quadradoSituacao);
         quadradoSituacao.addEventListener("click", async () => {
             const novaSituacao = dados.situacao === "Concluído" ? "Em andamento" : "Concluído";
-            await updateDoc(doc(db, "FORM_WB "/*espaço*//*espaço*/, docSnapshot.id), { situacao: novaSituacao });
+            await updateDoc(doc(db, "FORM_WB "/*espaço*/, docSnapshot.id), { situacao: novaSituacao });
+
+            // ✅ Recarrega a página inteira após atualizar o campo
+            location.reload();
+
             quadradoSituacao.classList.toggle("concluido");
             quadradoSituacao.classList.toggle("andamento");
         });
@@ -641,7 +645,7 @@ async function carregarDiagnosticos() {
         botaoExcluir.addEventListener("click", async () => {
             if (confirm(`Deseja realmente excluir o registro de ${dados.nome}?`)) {
                 await deleteDoc(doc(db, "FORM_WB "/*espaço*/, docSnapshot.id));
-                alert("Demanda excluído com sucesso!");
+                alert("Demanda excluída com sucesso!");
                 carregarDiagnosticos();
             }
         });
